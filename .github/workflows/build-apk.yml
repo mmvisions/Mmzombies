@@ -1,11 +1,13 @@
 name: Build Android APK
 
-on:
+"on":
+  push:
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -14,13 +16,14 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: "17"
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Android SDK 35
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Install Android SDK
+        run: |
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
       - name: Extract Android project
         run: |
@@ -31,9 +34,10 @@ jobs:
           curl -L -o gradle.zip https://services.gradle.org/distributions/gradle-8.9-bin.zip
           unzip -q gradle.zip -d "$HOME/gradle"
 
-      - name: Build debug APK
-        working-directory: project/MateZombik
-        run: "$HOME/gradle/gradle-8.9/bin/gradle" assembleDebug --no-daemon
+      - name: Build APK
+        run: |
+          cd project/MateZombik
+          "$HOME/gradle/gradle-8.9/bin/gradle" assembleDebug --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
